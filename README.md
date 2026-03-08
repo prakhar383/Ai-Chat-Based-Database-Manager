@@ -2,7 +2,6 @@
 
 This repository contains the solution for the AI-First CRM Healthcare Professional (HCP) Module assignment. It features a "Log Interaction Screen" designed for Life Sciences field representatives, allowing them to log meeting details via a structured React form or a conversational AI assistant.
 
-*Note: In accordance with the assignment requirements, 100% of the code in this repository was generated using AI with zero human-written code.*
 
 ## 🚀 Features
 * **Split-Screen Interface:** A modern UI with a structured form on the left and an AI chat interface on the right.

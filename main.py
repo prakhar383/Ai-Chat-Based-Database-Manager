@@ -1,3 +1,4 @@
+import json
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -12,7 +13,7 @@ import agent
 # Creates the tables in PostgreSQL automatically when the server starts
 models.Base.metadata.create_all(bind=database.engine)
 
-app = FastAPI(title="HCP Interaction API")
+app = FastAPI(title="Ai Chat based Database Manager")
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -52,8 +53,30 @@ def chat_with_agent(request: ChatRequest):
     """Endpoint that passes the user's chat message to the LangGraph agent."""
     try:
         # Calls the function we built in agent.py
-        ai_response = agent.process_chat_message(request.message)
-        return {"reply": ai_response}
+        response = agent.process_chat_message(request.message)
+        
+        # Default reply is the AI's conversational text
+        final_reply = response["messages"][-1].content
+        extracted_data = None
+
+        # Look back through the AI's thoughts to see if it used the save_interaction tool
+        for msg in reversed(response["messages"]):
+            if hasattr(msg, "name") and msg.name == "save_interaction":
+                try:
+                    tool_result = json.loads(msg.content)
+                    if "extracted_data" in tool_result:
+                        extracted_data = tool_result["extracted_data"]
+                        final_reply = f"✅ I've successfully saved that record to the database! You can see the details in the preview panel on the left."
+                        break
+                except json.JSONDecodeError:
+                    continue
+
+        # Send BOTH the reply text and the hidden form data back to React
+        return {
+            "reply": final_reply,
+            "extracted_data": extracted_data
+        }
     except Exception as e:
-        # Returns a clean error if the Groq API key is wrong or fails
+        # This will print the exact reason to your Uvicorn terminal!
+        print(f"🚨 CRITICAL ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Agent Error: {str(e)}")

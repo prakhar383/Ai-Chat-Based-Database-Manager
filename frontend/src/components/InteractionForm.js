@@ -23,7 +23,6 @@ const InteractionForm = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       if (error.response) {
-        // This will print the exact field FastAPI is rejecting!
         console.error("FastAPI Error Detail:", error.response.data.detail);
         alert(JSON.stringify(error.response.data.detail, null, 2)); 
       } else {
@@ -34,7 +33,8 @@ const InteractionForm = () => {
 
   return (
     <div className="interaction-form-container">
-      <h2>Interaction Details</h2>
+      <h2>Record Preview</h2>
+      <p className="form-subtitle">This shows a live look at the data the AI is managing.</p>
       <form onSubmit={handleSubmit} className="interaction-form">
         <label>HCP Name *</label>
         <input name="hcp_name" value={form.hcp_name} onChange={handleChange} required />
@@ -74,13 +74,32 @@ const InteractionForm = () => {
         <label>Observed/Inferred HCP Sentiment *</label>
         <div className="radio-group">
           <label>
-            <input type="radio" name="sentiment" value="Positive" onChange={handleChange} required /> Positive
+            <input 
+              type="radio" 
+              name="sentiment" 
+              value="Positive" 
+              checked={form.sentiment === "Positive"} 
+              onChange={handleChange} 
+              required 
+            /> Positive
           </label>
           <label>
-            <input type="radio" name="sentiment" value="Neutral" onChange={handleChange} /> Neutral
+            <input 
+              type="radio" 
+              name="sentiment" 
+              value="Neutral" 
+              checked={form.sentiment === "Neutral"} 
+              onChange={handleChange} 
+            /> Neutral
           </label>
           <label>
-            <input type="radio" name="sentiment" value="Negative" onChange={handleChange} /> Negative
+            <input 
+              type="radio" 
+              name="sentiment" 
+              value="Negative" 
+              checked={form.sentiment === "Negative"} 
+              onChange={handleChange} 
+            /> Negative
           </label>
         </div>
 

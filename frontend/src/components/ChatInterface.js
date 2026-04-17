@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessage } from "../redux/interactionSlice";
+// We import updateField here so the AI can fill the form
+import { addMessage, updateField } from "../redux/interactionSlice";
 import ChatMessage from "./ChatMessage";
 
 const ChatInterface = () => {
@@ -14,8 +15,8 @@ const ChatInterface = () => {
     if (!input.trim()) return;
 
     // Save user message to Redux and clear input
-    dispatch(addMessage({ sender: "user", text: input }));
     const messageToSend = input;
+    dispatch(addMessage({ sender: "user", text: messageToSend }));
     setInput("");
 
     try {
@@ -23,8 +24,19 @@ const ChatInterface = () => {
         message: messageToSend
       });
 
-      // Update Redux with the AI's reply
+      // Update Redux with the AI's reply text
       dispatch(addMessage({ sender: "ai", text: response.data.reply }));
+
+      // HUMAN-IN-THE-LOOP MAGIC: If the AI extracted data, auto-fill the Redux form!
+      if (response.data.extracted_data) {
+        const extracted = response.data.extracted_data;
+        Object.keys(extracted).forEach((key) => {
+          if (extracted[key]) {
+            // This perfectly matches your interactionSlice logic!
+            dispatch(updateField({ field: key, value: extracted[key] }));
+          }
+        });
+      }
     } catch (error) {
       dispatch(addMessage({ sender: "ai", text: "Error contacting AI Agent." }));
     }

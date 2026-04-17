@@ -7,12 +7,12 @@ function App() {
   return (
     <div className="app-container">
       <div className="left-panel">
-        <h2>Interaction Details</h2>
+        <h2>Live Database Preview</h2>
         <InteractionForm />
       </div>
 
       <div className="right-panel">
-        <h2>AI Assistant</h2>
+        <h2>Ai Data Assistant</h2>
         <ChatInterface />
       </div>
     </div>
